@@ -1,3 +1,5 @@
+import { fetchAsText } from "./lib-net.js";
+
 /**
  * 
  * @param {WebGLRenderingContext} gl 
@@ -12,6 +14,16 @@ export function createVertexShader(gl, vertexShaderCode) {
       `Vertex shader failed to compile.  The error log is: ${
       gl.getShaderInfoLog(vertexShader)}`);
   return vertexShader;
+}
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {string} vertexShaderCodeURL 
+ */
+export async function createVertexShaderFromURL(gl, vertexShaderCodeURL) {
+  const vertexShaderCode = await fetchAsText(vertexShaderCodeURL);
+  return createVertexShader(gl, vertexShaderCode);
 }
 
 /**
@@ -33,14 +45,44 @@ export function createFragmentShader(gl, fragmentShaderCode) {
 /**
  * 
  * @param {WebGLRenderingContext} gl 
+ * @param {string} fragmentShaderCodeURL 
+ */
+export async function createFragmentShaderFromURL(gl, fragmentShaderCodeURL) {
+  const fragmentShaderCode = await fetchAsText(fragmentShaderCodeURL);
+  return createFragmentShader(gl, fragmentShaderCode);
+}
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
  * @param {string} vertexShaderCode 
  * @param {string} fragmentShaderCode 
  */
 export function createProgram(gl, vertexShaderCode, fragmentShaderCode) {
+  const vertexShader = createVertexShader(gl, vertexShaderCode);
+  const fragmentShader = createFragmentShader(gl, fragmentShaderCode);
+  
   return createProgramFromShaders(
     gl,
-    createVertexShader(gl, vertexShaderCode),
-    createFragmentShader(gl, fragmentShaderCode),
+    vertexShader,
+    fragmentShader,
+  );
+}
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {string} vertexShaderCodeURL 
+ * @param {string} fragmentShaderCodeURL 
+ */
+export async function createProgramFromURLs(gl, vertexShaderCodeURL, fragmentShaderCodeURL) {
+  const vertexShader = await createVertexShaderFromURL(gl, vertexShaderCodeURL);
+  const fragmentShader = await createVertexShaderFromURL(gl, fragmentShaderCodeURL);
+
+  return createProgramFromShaders(
+    gl,
+    vertexShader,
+    fragmentShader,
   );
 }
 
@@ -63,3 +105,4 @@ export function createProgramFromShaders(gl, vertexShader, fragmentShader) {
 
   return program;
 }
+
