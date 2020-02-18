@@ -19,10 +19,10 @@ export function createVertexShader(gl, vertexShaderCode) {
 /**
  * 
  * @param {WebGLRenderingContext} gl 
- * @param {string} vertexShaderCodeURL 
+ * @param {string} vertexShaderCodePath
  */
-export async function createVertexShaderFromURL(gl, vertexShaderCodeURL) {
-  const vertexShaderCode = await fetchAsText(vertexShaderCodeURL);
+export async function createVertexShaderFromPath(gl, vertexShaderCodePath) {
+  const vertexShaderCode = await fetchAsText(vertexShaderCodePath);
   return createVertexShader(gl, vertexShaderCode);
 }
 
@@ -45,10 +45,10 @@ export function createFragmentShader(gl, fragmentShaderCode) {
 /**
  * 
  * @param {WebGLRenderingContext} gl 
- * @param {string} fragmentShaderCodeURL 
+ * @param {string} fragmentShaderCodePath 
  */
-export async function createFragmentShaderFromURL(gl, fragmentShaderCodeURL) {
-  const fragmentShaderCode = await fetchAsText(fragmentShaderCodeURL);
+export async function createFragmentShaderFromPath(gl, fragmentShaderCodePath) {
+  const fragmentShaderCode = await fetchAsText(fragmentShaderCodePath);
   return createFragmentShader(gl, fragmentShaderCode);
 }
 
@@ -61,7 +61,7 @@ export async function createFragmentShaderFromURL(gl, fragmentShaderCodeURL) {
 export function createProgram(gl, vertexShaderCode, fragmentShaderCode) {
   const vertexShader = createVertexShader(gl, vertexShaderCode);
   const fragmentShader = createFragmentShader(gl, fragmentShaderCode);
-  
+
   return createProgramFromShaders(
     gl,
     vertexShader,
@@ -72,12 +72,12 @@ export function createProgram(gl, vertexShaderCode, fragmentShaderCode) {
 /**
  * 
  * @param {WebGLRenderingContext} gl 
- * @param {string} vertexShaderCodeURL 
- * @param {string} fragmentShaderCodeURL 
+ * @param {string} vertexShaderCodePath 
+ * @param {string} fragmentShaderCodePath 
  */
-export async function createProgramFromURLs(gl, vertexShaderCodeURL, fragmentShaderCodeURL) {
-  const vertexShader = await createVertexShaderFromURL(gl, vertexShaderCodeURL);
-  const fragmentShader = await createVertexShaderFromURL(gl, fragmentShaderCodeURL);
+export async function createProgramFromPaths(gl, vertexShaderCodePath, fragmentShaderCodePath) {
+  const vertexShader = await createVertexShaderFromPath(gl, vertexShaderCodePath);
+  const fragmentShader = await createVertexShaderFromPath(gl, fragmentShaderCodePath);
 
   return createProgramFromShaders(
     gl,
