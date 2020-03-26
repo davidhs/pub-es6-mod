@@ -31,6 +31,18 @@ export function isNull(x) {
  * 
  * @param {unknown} x 
  */
+export function isPromise(x) {
+  if (Promise && Promise.resolve) {
+    return Promise.resolve(x) == x;
+  } else {
+    throw new Error("Promises not supported.");
+  }
+}
+
+/**
+ * 
+ * @param {unknown} x 
+ */
 export function isUndefined(x) {
   return typeof x === "undefined";
 }
@@ -166,8 +178,3 @@ export function isPrototypeOf(x, v) {
 export function isEnumerable(x, v) {
   return {}.propertyIsEnumerable.call(x, v)
 }
-
-
-
-
-

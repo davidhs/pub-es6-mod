@@ -12,6 +12,7 @@ export async function fetchAsText(input, init) {
   return result;
 }
 
+
 /**
  * 
  * @param {RequestInfo} input 
@@ -25,6 +26,7 @@ export async function fetchAsJSON(input, init) {
   const result = await response.json();
   return result;
 }
+
 
 /**
  * 
@@ -40,6 +42,7 @@ export async function fetchAsArrayBuffer(input, init) {
   return result;
 }
 
+
 /**
  * 
  * @param {RequestInfo} input 
@@ -53,6 +56,7 @@ export async function fetchAsBlob(input, init) {
   const result = await response.blob();
   return result;
 }
+
 
 /**
  * 

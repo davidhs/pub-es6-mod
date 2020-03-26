@@ -1,104 +1,18 @@
-import { BufReader } from "https://deno.land/std/io/mod.ts";
-import { TextProtoReader } from "https://deno.land/std/textproto/mod.ts";
+import { assert } from "../../es/unstable/lib.js";
+import { resolveFilePath } from "./lib-misc.js";
+
 import * as path from "https://deno.land/std/path/mod.ts";
 
-/**
- * 
- * @param {unknown} condition 
- * @param {string=} message 
- * 
- * @throws
- */
-function assert(condition, message = "Assertion failed!") {
-  if (!condition) {
-    console.error(message);
-    throw new Error(message);
-  }
-}
 
 /**
  * 
- * @param {string} filename 
- * 
- * @returns {Promise<string>}
- * 
- * @throws
+ * @param {string} filePath 
  */
-export async function readFileToString(filename) {
+export async function readFileAsText(filePath) {
+  const bytes = await Deno.readFile(filePath);
   const decoder = new TextDecoder("utf-8");
-  const bytes = await Deno.readFile(filename);
   const text = decoder.decode(bytes);
   return text;
-}
-
-/**
- * Tests whether or not given directory exists or not.
- * 
- * @param {string} filePath 
- * 
- * @returns {Promise<boolean>}
- */
-export async function filePathExists(filePath) {
-  try {
-    await Deno.lstat(filePath);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-/**
- * 
- * @param {string} filePath 
- * 
- * @returns {Promise<boolean>}
- */
-export async function isDirectory(filePath) {
-  const lstat = await Deno.lstat(filePath);
-  return lstat.isDirectory();
-}
-
-/**
- * @returns {Promise<string>}
- */
-export async function readLine() {
-  const tpr = new TextProtoReader(new BufReader(Deno.stdin));
-  /** @type {string | Deno.EOF} */
-  const line = await tpr.readLine();
-  if (typeof line === "string") return line;
-  else return "";
-}
-
-/**
- * 
- * @param {string} question 
- */
-export async function prompt(question) {
-  console.info(question);
-  const answer = await readLine();
-  return answer;
-}
-
-/**
- * 
- * @param {string} dirPath 
- * @param {boolean=} includeDirPath 
- */
-export async function listDirectory(dirPath, includeDirPath = false) {
-  /** @type {string[]} */
-  const filePaths = [];
-
-  const fileInfoList = await Deno.readDir(dirPath);
-
-  for (const fileInfo of fileInfoList) {
-    const { name } = fileInfo;
-    if (typeof name === "string") {
-      if (includeDirPath) filePaths.push(path.join(dirPath, name));
-      else filePaths.push(name);
-    }
-  }
-
-  return filePaths;
 }
 
 
@@ -167,6 +81,7 @@ export async function copyDirContents(sourceDirPath, targetDirPath, overwrite) {
   }
 }
 
+
 /**
  * Returns `true` if directory didn't exist or was able to delete directory,
  * otherwise returns `false` if user didn't want to delete directory.
@@ -215,3 +130,133 @@ export async function writeFile(filePath, text) {
   file.close();
 }
 
+
+/**
+ * 
+ * @param {string} dirPath 
+ * @param {boolean=} includeDirPath 
+ */
+export async function listDirectory(dirPath, includeDirPath = false) {
+  /** @type {string[]} */
+  const filePaths = [];
+
+  const fileInfoList = await Deno.readDir(dirPath);
+
+  for (const fileInfo of fileInfoList) {
+    const { name } = fileInfo;
+    if (typeof name === "string") {
+      if (includeDirPath) filePaths.push(path.join(dirPath, name));
+      else filePaths.push(name);
+    }
+  }
+
+  return filePaths;
+}
+
+
+/**
+ * 
+ * @param {string} filename 
+ * 
+ * @returns {Promise<string>}
+ * 
+ * @throws
+ */
+export async function readFileToString(filename) {
+  const decoder = new TextDecoder("utf-8");
+  const bytes = await Deno.readFile(filename);
+  const text = decoder.decode(bytes);
+  return text;
+}
+
+
+/**
+ * Tests whether or not given directory exists or not.
+ * 
+ * @param {string} filePath 
+ * 
+ * @returns {Promise<boolean>}
+ */
+export async function filePathExists(filePath) {
+  try {
+    await Deno.lstat(filePath);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+
+/**
+ * 
+ * @param {string} filePath 
+ * 
+ * @returns {Promise<boolean>}
+ */
+export async function isDirectory(filePath) {
+  const lstat = await Deno.lstat(filePath);
+  return lstat.isDirectory();
+}
+
+
+/**
+ * 
+ * @typedef {{ filePath: string, info: Deno.FileInfo, progress: number, depth: number }} CallbackNode
+ * 
+ * @param {string} filePath 
+ * @param {((node: CallbackNode) => void) | ((node: CallbackNode) => Promise<void>)} callback 
+ */
+export async function walk(filePath, callback) {
+  const cb = callback;
+
+  // TODO: check if filePath even exists!
+
+  const afp = resolveFilePath(filePath);
+
+  /**
+   * 
+   * @param {string} fp File path
+   * @param {number} pf Progress from
+   * @param {number} pt Progress to
+   * @param {number} d Depth
+   */
+  async function internalWalk(fp, pf, pt, d) {
+    const lstat = await Deno.lstat(fp);
+  
+    const result = cb({
+      filePath: fp,
+      info: lstat,
+      progress: pf,
+      depth: d
+    });
+  
+    if (isPromise(result)) {
+      await result;
+    }
+  
+    if (lstat.isDirectory()) {
+      const fileInfoList = await Deno.readDir(fp);
+
+      const n = fileInfoList.length;
+
+      if (n > 0) {
+        // Child progress increment
+        const cpi = (pt - pf) / n;
+
+
+        for (let i = 0; i < n; i += 1) {
+          const fileInfo = fileInfoList[i];
+          const { name } = fileInfo;
+          const cfp = resolveFilePath(path.join(fp, name));
+  
+          const cpf = pf + i * cpi;
+          const cpt = pf + (i + 1) * cpi;
+    
+          await internalWalk(cfp, cpf, cpt, d + 1);
+        }
+      }
+    }
+  }
+
+  await internalWalk(afp, 0, 1, 0);
+}
