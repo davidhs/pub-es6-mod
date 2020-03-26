@@ -1,4 +1,4 @@
-import { assert } from "../../es/unstable/lib.js";
+import { assert, isPromise } from "../../es/unstable/lib.js";
 import { resolveFilePath } from "./lib-misc.js";
 
 import * as path from "https://deno.land/std/path/mod.ts";
