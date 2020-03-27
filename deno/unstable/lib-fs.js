@@ -1,4 +1,5 @@
 import { assert, isPromise } from "../../es/unstable/lib.js";
+import { formatDate, formatTime } from "../../es/unstable/lib-time.js";
 import { resolveFilePath } from "./lib-misc.js";
 
 import * as path from "https://deno.land/std/path/mod.ts";
@@ -280,3 +281,98 @@ export async function exists(filePath) {
 }
 
 
+/**
+ * Deduplicates files and folders recursively that are found in the files and
+ * folders in `targetFilePaths`.
+ * 
+ * @param {string[]} targetFilePaths 
+ */
+export async function dedup(targetFilePaths) {
+  /** 
+   * Absolute file paths of files / folders THAT DO EXIST.
+   * 
+   * @type {string[]}
+   */
+  const filePaths = [];
+
+  {
+    /** @type {Set<string>} */
+    const dedupSet = new Set();
+
+    // resolveFilePath
+    for (const filePath of targetFilePaths) {
+      /** @type {string} */
+      const absoluteFilePath = resolveFilePath(filePath);
+      assert(typeof absoluteFilePath === "string");
+
+      if (!(await exists(absoluteFilePath))) continue;
+
+      if (dedupSet.has(absoluteFilePath)) continue;
+
+      // TODO: at some point find a way to remove entries which belong to other
+      // entries here.
+
+      dedupSet.add(absoluteFilePath);
+    }
+
+    const dedupArr = Array.from(dedupSet);
+    dedupArr.forEach((filePath) => {
+      filePaths.push(filePath);
+    });
+  }
+
+  /** @type {Set<string>} */
+  const hash_set = new Set();
+
+  {
+    const timeStarted = Date.now();
+
+    const n = filePaths.length;
+
+    for (let i = 0; i < n; i += 1) {
+      const filePath = filePaths[i];
+
+      await walk(filePath, async (node) => {
+        const { filePath, info, progress } = node;
+  
+        if (info.isDirectory()) return;
+        if (info.isSymlink()) return;
+  
+        const bytes = await Deno.readFile(filePath);
+        const hasher = hashWithSHA2_256;
+        const hash = hasher(bytes);
+
+
+        const totalProgress = (progress + i) / n;
+
+        const tps = `${(totalProgress * 100).toFixed(3)}%`;
+
+        const timeNow = Date.now();
+
+        const elapsedTime = timeNow - timeStarted;
+
+        const estimatedTotalTime = elapsedTime / totalProgress;
+
+        const estimatedTimeRemaining = estimatedTotalTime - elapsedTime;
+
+
+        const estimatedTimeComplete = timeStarted + estimatedTotalTime;
+
+
+        const etr = formatTime(estimatedTimeRemaining);
+
+        const etc = formatDate(estimatedTimeComplete);
+
+        const msg = `PROGRESS(${tps}), ETA(${etc}), ETE(${etr}), HASH(${hash}), FILEPATH(${filePath})`;
+  
+        if (hash_set.has(hash)) {
+          console.info(`DEDUP, ${msg}`);
+          await Deno.remove(filePath, { recursive: false });
+        } else {
+          console.info(`${msg}`);
+          hash_set.add(hash);
+        }
+      });
+    }
+  }
+}
