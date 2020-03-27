@@ -260,3 +260,23 @@ export async function walk(filePath, callback) {
 
   await internalWalk(afp, 0, 1, 0);
 }
+
+
+/**
+ * 
+ * @param {string} filePath 
+ */
+export async function exists(filePath) {
+  try {
+    await Deno.lstat(filePath);
+    return true;
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      return false;
+    }
+
+    throw e;
+  }
+}
+
+
