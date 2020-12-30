@@ -23,6 +23,10 @@ const STATE_COMMENT      = 3;
 const STATE_STRING       = 4;
 const STATE_WORD         = 5;
 
+// Regular expression to match against whitespace characters.
+//
+// TODO: match against multiple whitespace characters.
+// TODO: match against whitespaces characters and strings.
 const REGEX_WS = /\s/;
 
 /**
@@ -33,6 +37,52 @@ function isWhitespace(c) {
   return c.match(REGEX_WS) !== null;
 }
 
+export class Token {
+
+  /**
+   * 
+   * @param {TOKEN_TYPE_WHITESPACE|TOKEN_TYPE_WORD|TOKEN_TYPE_BRACKET_OPEN|TOKEN_TYPE_BRACKET_CLOSE|TOKEN_TYPE_STRING|TOKEN_TYPE_COMMENT} type 
+   * @param {number} fromPosition
+   * @param {number} toPosition
+   * @param {number} fromRow
+   * @param {number} toRow
+   * @param {number} fromColumn
+   * @param {number} toColumn
+   */
+  constructor(type, fromPosition, toPosition, fromRow, fromColumn, toRow, toColumn) {
+    this.type = type;
+
+    this.fromPosition = fromPosition;
+    this.toPosition   = toPosition;
+    
+    this.fromRow    = fromRow;
+    this.fromColumn = fromColumn;
+
+    this.toRow    = toRow;
+    this.toColumn = toColumn;
+
+    this.lexeme = undefined;
+  }
+
+  /**
+   * 
+   * @param {undefined|string} code 
+   * 
+   * @throws
+   */
+  getLexeme(code) {
+    if (code !== undefined) {
+      this.lexeme = code.substring(this.fromPosition, this.toPosition);
+      return this.lexeme;
+    }
+
+    if (this.lexeme === undefined) {
+      throw new Error("Lexeme undefined.");
+    }
+
+    return this.lexeme;
+  }
+}
 
 /**
  * 
@@ -42,14 +92,10 @@ function isWhitespace(c) {
  * 
  * @throws
  */
-export function parse(code) {
-  //////////////
-  // Tokenize //
-  //////////////
-
+export function tokenize(code) {
   const codeLength = code.length;
 
-  /** @type {string[]} */
+  /** @type {Token[]} */
   const tokens = [];
 
   let tokenType   = PARSE_NODE_TYPE_WHITESPACE;
@@ -63,9 +109,11 @@ export function parse(code) {
   let rowIndex = 0;
   let columnIndex = 0;
 
+  // Walk through loop.
   codeLoop: for (let codeIndex = 0; codeIndex < codeLength; codeIndex += 1) {
     const c = code[codeIndex]; // Current character
 
+    // Decide and take action based off of character.
     decisionLoop: while (true) {
       if (state === STATE_UNDETERMINED) {
         if (isWhitespace(c)) {
@@ -178,17 +226,49 @@ export function parse(code) {
   // TODO: add more state checks
 
   if (state === STATE_STRING) {
+    // Unterminated string.
     throw new Error("Unterminated string.");
   } else if (state === STATE_WORD) {
     tokens.push(code.substring(tokenIndex, tokenIndex + tokenLength));
   }
 
-  ///////////
-  // Parse //
-  ///////////
-
-  console.info(tokens);
-
-  throw new Error("Not implemented!");
+  return tokens;
 }
 
+export const PARSE_NODE_TYPE_TOKEN = 10;
+export const PARSE_NODE_TYPE_LIST  = 11;
+
+export class ParseNode {
+
+  /**
+   * 
+   * @param {PARSE_NODE_TYPE_TOKEN|PARSE_NODE_TYPE_LIST} type 
+   * @param {Token|ParseNode[]} value 
+   */
+  constructor(type, value) {
+    this.type = type;
+    this.value = value;
+  }
+
+  addChild(child) {
+
+  }
+
+  addChildLength(child) {}
+}
+
+/**
+ * 
+ * @param {string} code 
+ * @param {boolean} includeComments 
+ * @param {boolean} includeWhitespace 
+ * @param {boolean} includeListDelimiters 
+ * 
+ * @throws
+ */
+export function parse(code, includeComments, includeWhitespace, includeListDelimiters) {
+  const tokens = tokenize(code);
+  
+
+  throw new Error("Not implemented!")
+}
