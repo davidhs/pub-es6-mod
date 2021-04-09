@@ -1,17 +1,17 @@
 /**
  * Formats date as `YYYY-MM-DD HH:mm:ss` by default, otherwise outputs
  * `????-??-?? ??:??:??`.
- * 
+ *
  * TODO: at some point rename this function.
- * 
+ *
  * @param {number} time Unix time in milliseconds
  */
 export function formatDate(time) {
   if (!Number.isFinite(time)) {
     return "????-??-?? ??:??:??";
   }
-  
-  const s = (new Date(time)).toJSON();
+
+  const s = new Date(time).toJSON();
   const d = `${s.substring(0, 10)} ${s.substring(11, 23)}`;
 
   return d;
@@ -21,9 +21,9 @@ export function formatDate(time) {
  * Returns time formatted as `d HH:mm:ss.SSS` where `d` is the nr. of days, `H`
  * is the nr. of hours, `m` is the nr. of minutes, `s` is the number of seconds
  * and `S` is the number of milliseconds.
- * 
+ *
  * TODO: at some point rename this function.
- * 
+ *
  * @param {number} time Time in milliseconds.
  */
 export function formatTime(time) {
@@ -45,7 +45,7 @@ export function formatTime(time) {
 
   if (t > 0) {
     x_ms = t % 1000;
-    
+
     t = Math.floor((t - x_ms) / 1000);
 
     level += 1;
@@ -96,7 +96,6 @@ export function formatTime(time) {
   const m = `${x_m}`.padStart(2, "0");
   const h = `${x_h}`.padStart(2, "0");
   const d = `${x_d}`;
-
 
   const msg = `${d} ${h}:${m}:${s}.${ms}`;
 

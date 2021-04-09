@@ -1,7 +1,7 @@
 /**
- * 
- * @param {RequestInfo} input 
- * @param {RequestInit=} init 
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit=} init
  */
 export async function fetchAsText(input, init) {
   const response = await fetch(input, init);
@@ -12,11 +12,10 @@ export async function fetchAsText(input, init) {
   return result;
 }
 
-
 /**
- * 
- * @param {RequestInfo} input 
- * @param {RequestInit=} init 
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit=} init
  */
 export async function fetchAsJSON(input, init) {
   const response = await fetch(input, init);
@@ -27,11 +26,10 @@ export async function fetchAsJSON(input, init) {
   return result;
 }
 
-
 /**
- * 
- * @param {RequestInfo} input 
- * @param {RequestInit=} init 
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit=} init
  */
 export async function fetchAsArrayBuffer(input, init) {
   const response = await fetch(input, init);
@@ -42,11 +40,10 @@ export async function fetchAsArrayBuffer(input, init) {
   return result;
 }
 
-
 /**
- * 
- * @param {RequestInfo} input 
- * @param {RequestInit=} init 
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit=} init
  */
 export async function fetchAsBlob(input, init) {
   const response = await fetch(input, init);
@@ -57,11 +54,10 @@ export async function fetchAsBlob(input, init) {
   return result;
 }
 
-
 /**
- * 
- * @param {RequestInfo} input 
- * @param {RequestInit=} init 
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit=} init
  */
 export async function fetchAsFormData(input, init) {
   const response = await fetch(input, init);

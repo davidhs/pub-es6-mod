@@ -4,10 +4,9 @@ import { resolveFilePath } from "./lib-misc.js";
 
 import * as path from "https://deno.land/std/path/mod.ts";
 
-
 /**
- * 
- * @param {string} filePath 
+ *
+ * @param {string} filePath
  */
 export async function readFileAsText(filePath) {
   const bytes = await Deno.readFile(filePath);
@@ -16,29 +15,40 @@ export async function readFileAsText(filePath) {
   return text;
 }
 
-
 /**
- * 
- * @param {string} sourcePath 
- * @param {string} targetPath 
- * @param {boolean=} overwrite 
- * @param {boolean=} recursive 
+ *
+ * @param {string} sourcePath
+ * @param {string} targetPath
+ * @param {boolean=} overwrite
+ * @param {boolean=} recursive
  */
-export async function copyFile(sourcePath, targetPath, overwrite = false, recursive = false) {
-  assert(await filePathExists(sourcePath), `Expected path to exist: ${sourcePath}`);
+export async function copyFile(
+  sourcePath,
+  targetPath,
+  overwrite = false,
+  recursive = false
+) {
+  assert(
+    await filePathExists(sourcePath),
+    `Expected path to exist: ${sourcePath}`
+  );
 
   if (await filePathExists(targetPath)) {
     if (!overwrite) {
-      throw new Error(`Target path already exists and overwrite is not set to true: ${targetPath}`);
+      throw new Error(
+        `Target path already exists and overwrite is not set to true: ${targetPath}`
+      );
     } else {
       if (await isDirectory(targetPath)) {
         if (recursive) {
-          await Deno.remove(targetPath, { recursive: true })
+          await Deno.remove(targetPath, { recursive: true });
         } else {
-          throw new Error(`Deleting directory, must set recursive to true: ${targetPath}`);
+          throw new Error(
+            `Deleting directory, must set recursive to true: ${targetPath}`
+          );
         }
       } else {
-        await Deno.remove(targetPath)
+        await Deno.remove(targetPath);
       }
     }
   }
@@ -47,7 +57,9 @@ export async function copyFile(sourcePath, targetPath, overwrite = false, recurs
 
   if (await isDirectory(sourcePath)) {
     if (!recursive) {
-      throw new Error(`Source path is a directory and recursive is set to false: ${sourcePath}`);
+      throw new Error(
+        `Source path is a directory and recursive is set to false: ${sourcePath}`
+      );
     } else {
       await Deno.mkdir(targetPath);
       await copyDirContents(sourcePath, targetPath);
@@ -58,14 +70,13 @@ export async function copyFile(sourcePath, targetPath, overwrite = false, recurs
   }
 }
 
-
 /**
  * Copies everything from directory at `sourceDirPath` into directory at
  * `targetDirPath`.
- * 
- * @param {string} sourceDirPath 
- * @param {string} targetDirPath 
- * @param {boolean=} overwrite 
+ *
+ * @param {string} sourceDirPath
+ * @param {string} targetDirPath
+ * @param {boolean=} overwrite
  */
 export async function copyDirContents(sourceDirPath, targetDirPath, overwrite) {
   assert(await filePathExists(sourceDirPath));
@@ -82,14 +93,13 @@ export async function copyDirContents(sourceDirPath, targetDirPath, overwrite) {
   }
 }
 
-
 /**
  * Returns `true` if directory didn't exist or was able to delete directory,
  * otherwise returns `false` if user didn't want to delete directory.
- * 
- * @param {string} dirPath 
+ *
+ * @param {string} dirPath
  * @param {boolean=} force If `true`, does not ask user to delete directory.
- * 
+ *
  * @throws If path is not a directory.
  */
 export async function removeDirIfExists(dirPath, force = false) {
@@ -100,7 +110,9 @@ export async function removeDirIfExists(dirPath, force = false) {
         return true;
       } else {
         // Prompt use to delete directory
-        const answer = await prompt(`Delete directory ${dirPath} (${path.resolve(dirPath)})? (y/n)`)
+        const answer = await prompt(
+          `Delete directory ${dirPath} (${path.resolve(dirPath)})? (y/n)`
+        );
         if (answer.trim() === "y") {
           await Deno.remove(dirPath, { recursive: true });
           return true;
@@ -109,33 +121,31 @@ export async function removeDirIfExists(dirPath, force = false) {
         }
       }
     } else {
-      throw new Error(`Expected dist to be a directory, but isn't.`)
+      throw new Error(`Expected dist to be a directory, but isn't.`);
     }
   }
 
   return true;
 }
 
-
 /**
- * 
- * @param {string} filePath 
- * @param {string} text 
+ *
+ * @param {string} filePath
+ * @param {string} text
  */
 export async function writeFile(filePath, text) {
   const encoder = new TextEncoder();
   const file = await Deno.open(filePath, "a+");
-  
+
   await file.write(encoder.encode(text));
 
   file.close();
 }
 
-
 /**
- * 
- * @param {string} dirPath 
- * @param {boolean=} includeDirPath 
+ *
+ * @param {string} dirPath
+ * @param {boolean=} includeDirPath
  */
 export async function listDirectory(dirPath, includeDirPath = false) {
   /** @type {string[]} */
@@ -154,13 +164,12 @@ export async function listDirectory(dirPath, includeDirPath = false) {
   return filePaths;
 }
 
-
 /**
- * 
- * @param {string} filename 
- * 
+ *
+ * @param {string} filename
+ *
  * @returns {Promise<string>}
- * 
+ *
  * @throws
  */
 export async function readFileToString(filename) {
@@ -170,12 +179,11 @@ export async function readFileToString(filename) {
   return text;
 }
 
-
 /**
  * Tests whether or not given directory exists or not.
- * 
- * @param {string} filePath 
- * 
+ *
+ * @param {string} filePath
+ *
  * @returns {Promise<boolean>}
  */
 export async function filePathExists(filePath) {
@@ -187,11 +195,10 @@ export async function filePathExists(filePath) {
   }
 }
 
-
 /**
- * 
- * @param {string} filePath 
- * 
+ *
+ * @param {string} filePath
+ *
  * @returns {Promise<boolean>}
  */
 export async function isDirectory(filePath) {
@@ -199,13 +206,12 @@ export async function isDirectory(filePath) {
   return lstat.isDirectory();
 }
 
-
 /**
- * 
+ *
  * @typedef {{ filePath: string, info: Deno.FileInfo, progress: number, depth: number }} CallbackNode
- * 
- * @param {string} filePath 
- * @param {((node: CallbackNode) => void) | ((node: CallbackNode) => Promise<void>)} callback 
+ *
+ * @param {string} filePath
+ * @param {((node: CallbackNode) => void) | ((node: CallbackNode) => Promise<void>)} callback
  */
 export async function walk(filePath, callback) {
   const cb = callback;
@@ -215,7 +221,7 @@ export async function walk(filePath, callback) {
   const afp = resolveFilePath(filePath);
 
   /**
-   * 
+   *
    * @param {string} fp File path
    * @param {number} pf Progress from
    * @param {number} pt Progress to
@@ -223,18 +229,18 @@ export async function walk(filePath, callback) {
    */
   async function internalWalk(fp, pf, pt, d) {
     const lstat = await Deno.lstat(fp);
-  
+
     const result = cb({
       filePath: fp,
       info: lstat,
       progress: pf,
-      depth: d
+      depth: d,
     });
-  
+
     if (isPromise(result)) {
       await result;
     }
-  
+
     if (lstat.isDirectory()) {
       const fileInfoList = await Deno.readDir(fp);
 
@@ -244,15 +250,14 @@ export async function walk(filePath, callback) {
         // Child progress increment
         const cpi = (pt - pf) / n;
 
-
         for (let i = 0; i < n; i += 1) {
           const fileInfo = fileInfoList[i];
           const { name } = fileInfo;
           const cfp = resolveFilePath(path.join(fp, name));
-  
+
           const cpf = pf + i * cpi;
           const cpt = pf + (i + 1) * cpi;
-    
+
           await internalWalk(cfp, cpf, cpt, d + 1);
         }
       }
@@ -262,10 +267,9 @@ export async function walk(filePath, callback) {
   await internalWalk(afp, 0, 1, 0);
 }
 
-
 /**
- * 
- * @param {string} filePath 
+ *
+ * @param {string} filePath
  */
 export async function exists(filePath) {
   try {
@@ -280,17 +284,16 @@ export async function exists(filePath) {
   }
 }
 
-
 /**
  * Deduplicates files and folders recursively that are found in the files and
  * folders in `targetFilePaths`.
- * 
- * @param {string[]} targetFilePaths 
+ *
+ * @param {string[]} targetFilePaths
  */
 export async function dedup(targetFilePaths) {
-  /** 
+  /**
    * Absolute file paths of files / folders THAT DO EXIST.
-   * 
+   *
    * @type {string[]}
    */
   const filePaths = [];
@@ -334,14 +337,13 @@ export async function dedup(targetFilePaths) {
 
       await walk(filePath, async (node) => {
         const { filePath, info, progress } = node;
-  
+
         if (info.isDirectory()) return;
         if (info.isSymlink()) return;
-  
+
         const bytes = await Deno.readFile(filePath);
         const hasher = hashWithSHA2_256;
         const hash = hasher(bytes);
-
 
         const totalProgress = (progress + i) / n;
 
@@ -355,16 +357,14 @@ export async function dedup(targetFilePaths) {
 
         const estimatedTimeRemaining = estimatedTotalTime - elapsedTime;
 
-
         const estimatedTimeComplete = timeStarted + estimatedTotalTime;
-
 
         const etr = formatTime(estimatedTimeRemaining);
 
         const etc = formatDate(estimatedTimeComplete);
 
         const msg = `PROGRESS(${tps}), ETA(${etc}), ETE(${etr}), HASH(${hash}), FILEPATH(${filePath})`;
-  
+
         if (hash_set.has(hash)) {
           console.info(`DEDUP, ${msg}`);
           await Deno.remove(filePath, { recursive: false });

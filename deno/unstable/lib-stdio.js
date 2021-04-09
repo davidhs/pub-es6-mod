@@ -1,7 +1,6 @@
 import { BufReader } from "https://deno.land/std/io/mod.ts";
 import { TextProtoReader } from "https://deno.land/std/textproto/mod.ts";
 
-
 /**
  * @returns {Promise<string>}
  */
@@ -13,10 +12,9 @@ export async function readLine() {
   else return "";
 }
 
-
 /**
- * 
- * @param {string} question 
+ *
+ * @param {string} question
  */
 export async function prompt(question) {
   console.info(question);

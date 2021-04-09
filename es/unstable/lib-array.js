@@ -1,17 +1,16 @@
 /**
  * Fisher-Yates shuffle, creates a copy.
- * 
+ *
  * @type {<T>(arr: T[]) => T[]}
  */
 export function getShuffled(arr) {
-  const copy = [...arr];  // Copy array
+  const copy = [...arr]; // Copy array
   return shuffleInPlace(copy);
 }
 
-
 /**
  * Fisher-Yates in-place shuffle.
- * 
+ *
  * @type {<T>(arr: T[]) => T[]}
  */
 export function shuffleInPlace(arr) {

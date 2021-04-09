@@ -15,7 +15,6 @@ export function snapshot(element, defaultValue = undefined) {
   return JSON.parse(JSON.stringify(element));
 }
 
-
 /**
  * If `source` and `target` are JavaScript objects (and not null) then
  * properties from `source` are inserted into `target`, and overwriting
@@ -40,21 +39,19 @@ export function mixin(source, target, overwrite = true) {
   }
 }
 
-
 /**
- * 
- * @param {any} x 
+ *
+ * @param {any} x
  */
 export function isEmpty(x) {
   return typeof x === "undefined" || x === null;
 }
 
-
 /**
- * 
- * @param {any} this 
- * @param {() => void} fn 
- * @param {number} ms 
+ *
+ * @param {any} this
+ * @param {() => void} fn
+ * @param {number} ms
  */
 export function debounce(this, fn, ms) {
   /** @type {number} */
@@ -68,17 +65,16 @@ export function debounce(this, fn, ms) {
   };
 }
 
-
 /**
- * 
+ *
  */
 export function createEmittableMessenger() {
   /** @type {string[]} */
   const message = [];
 
   /**
-   * 
-   * @param  {...any} args 
+   *
+   * @param  {...any} args
    */
   function emit(...args) {
     for (let i = 0; i < args.length; ++i) {
@@ -87,8 +83,8 @@ export function createEmittableMessenger() {
   }
 
   /**
-   * 
-   * @param  {...any} args 
+   *
+   * @param  {...any} args
    */
   function emitln(...args) {
     for (let i = 0; i < args.length; ++i) {

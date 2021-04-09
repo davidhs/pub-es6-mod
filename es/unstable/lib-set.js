@@ -1,6 +1,6 @@
 /**
  * a u b
- * 
+ *
  * @type {<A, B>(a: Set<A>, b: Set<B>) => Set<A | B>}
  *
  * @param {Set<any>} a
@@ -10,7 +10,6 @@ export function getSetUnion(a, b) {
   const union = new Set([...a, ...b]);
   return union;
 }
-
 
 /**
  * a n b
@@ -23,7 +22,6 @@ export function getSetIntersection(a, b) {
   return intersection;
 }
 
-
 /**
  * a - b OR a \ b
  *
@@ -34,7 +32,6 @@ export function getSetDifference(a, b) {
   const difference = new Set([...a].filter((x) => !b.has(x)));
   return difference;
 }
-
 
 /**
  *
