@@ -1,4 +1,4 @@
-/// <reference path="lib.types.d.ts" />
+/// <reference path="./lib.types.d.ts" />
 
 // TODO: add the ability to check whether two items are equivalent and are identical.
 
