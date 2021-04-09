@@ -30,15 +30,20 @@ function assert_function(condition, message = "") {
 export const assert = assert_function;
 
 /**
- *
+ * Returns `true` if the input has the value of undefined.
+ * 
  * @param {unknown} x
  */
 export function isUndefined(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "undefined"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "undefined";
 }
 
 /**
- *
+ * Returns `true` if the input is a null.
+ * 
  * @param {unknown} x
  */
 export function isNull(x) {
@@ -46,15 +51,20 @@ export function isNull(x) {
 }
 
 /**
- *
+ * Returns `true` if the input is a boolean.
+ * 
  * @param {unknown} x
  */
 export function isBoolean(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "boolean"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "boolean";
 }
 
 /**
- *
+ * Returns `true` if the input is truthy.
+ * 
  * @param {unknown} x
  */
 export function isTruthy(x) {
@@ -62,7 +72,8 @@ export function isTruthy(x) {
 }
 
 /**
- *
+ * Returns `true` if the input is falsy.
+ * 
  * @param {unknown} x
  */
 export function isFalsy(x) {
@@ -82,15 +93,20 @@ export function isPromise(x) {
 }
 
 /**
- *
+ * Returns `true` if the input is a string.
+ * 
  * @param {unknown} x
  */
 export function isString(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "strings"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "string";
 }
 
 /**
- *
+ * Returns `true` if the input is an array.
+ * 
  * @param {unknown} x
  */
 export function isArray(x) {
@@ -98,11 +114,15 @@ export function isArray(x) {
 }
 
 /**
- *
+ * Returns `true` if the input is an object such that it is not `null` and not an array.
+ * 
  * @param {unknown} x
  */
 export function isObject(x) {
-  return typeof x === "object" && !isArray(x) && !isNull(x);
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "object"` can optimized so it doesn't do a
+  //             string comparison.
+  return typeof x === "object" && x !== null && !Array.isArray(x);;
 }
 
 /**
@@ -138,7 +158,7 @@ export function isPrototypeOf(x, v) {
  * @param {string|number|symbol} v
  */
 export function isEnumerable(x, v) {
-  return {}.propertyIsEnumerable.call(x, v);
+  return Object.propertyIsEnumerable.call(x, v);
 }
 
 /**
@@ -146,6 +166,9 @@ export function isEnumerable(x, v) {
  * @param {unknown} x
  */
 export function isNumber(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "number"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "number" && Number.isFinite(x);
 }
 
@@ -154,13 +177,20 @@ export function isNumber(x) {
  * @param {unknown} x
  */
 export function isNaN(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "number"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "number" && Number.isNaN(x);
 }
 
 /**
- *
+ * Returns `true` if the input has the type of a function.
+ * 
  * @param {unknown} x
  */
 export function isFunction(x) {
+  // Assumption: `typeof x` can only return a fixed set of strings thus I assume
+  //             `typeof x === "function"` can optimized so it doesn't do a
+  //             string comparison.
   return typeof x === "function";
 }
