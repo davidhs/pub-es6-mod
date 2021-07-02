@@ -8,11 +8,20 @@ import * as path from "https://deno.land/std/path/mod.ts";
  *
  * @param {string} filePath
  */
-export async function readFileAsText(filePath) {
+ export function resolveFilePath(filePath) {
+  return path.resolve(filePath);
+}
+
+/**
+ * Reads file into string.
+ * 
+ * @param {string} filePath
+ */
+export async function readFileIntoString(filePath, encoding = "UTF-8") {
   const bytes = await Deno.readFile(filePath);
-  const decoder = new TextDecoder("utf-8");
-  const text = decoder.decode(bytes);
-  return text;
+  const decoder = new TextDecoder(encoding);
+  const s = decoder.decode(bytes);
+  return s;
 }
 
 /**
@@ -21,13 +30,10 @@ export async function readFileAsText(filePath) {
  * @param {string} targetPath
  * @param {boolean=} overwrite
  * @param {boolean=} recursive
+ * 
+ * @throws
  */
-export async function copyFile(
-  sourcePath,
-  targetPath,
-  overwrite = false,
-  recursive = false
-) {
+export async function copyFile(sourcePath, targetPath, overwrite = false, recursive = false) {
   assert(
     await filePathExists(sourcePath),
     `Expected path to exist: ${sourcePath}`
@@ -180,18 +186,24 @@ export async function readFileToString(filename) {
 }
 
 /**
- * Tests whether or not given directory exists or not.
- *
+ * Checks whether a file exists.
+ * 
  * @param {string} filePath
- *
- * @returns {Promise<boolean>}
  */
-export async function filePathExists(filePath) {
+ export async function exists(filePath) {
   try {
+    // Attempt to resolve the file path to determine its existance.
     await Deno.lstat(filePath);
     return true;
   } catch (e) {
-    return false;
+    // An exception is raised if the file doesn't exist, check
+    // for that exception.
+    if (e instanceof Deno.errors.NotFound) {
+      return false;
+    }
+
+    // For all other exceptions, propagation error up.
+    throw e;
   }
 }
 
@@ -207,7 +219,14 @@ export async function isDirectory(filePath) {
 }
 
 /**
- *
+ * Walks a file system tree starting at `filePath` and for each node of
+ * the tree the callback is invoked with the node.  If the callback
+ * returns a promise then the promise is awaited before continuing.
+ * 
+ * The callback is supplied with the file path of the node, the lstat
+ * information about it, the estimated walk progress and the depth of 
+ * the node w.r.t. to the root `filePath`.
+ * 
  * @typedef {{ filePath: string, info: Deno.FileInfo, progress: number, depth: number }} CallbackNode
  *
  * @param {string} filePath
@@ -268,25 +287,7 @@ export async function walk(filePath, callback) {
 }
 
 /**
- *
- * @param {string} filePath
- */
-export async function exists(filePath) {
-  try {
-    await Deno.lstat(filePath);
-    return true;
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      return false;
-    }
-
-    throw e;
-  }
-}
-
-/**
- * Deduplicates files and folders recursively that are found in the files and
- * folders in `targetFilePaths`.
+ * Deduplicates files that have the same SHA2-256 digest.
  *
  * @param {string[]} targetFilePaths
  */

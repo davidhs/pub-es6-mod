@@ -6,7 +6,7 @@ import { TextProtoReader } from "https://deno.land/std/textproto/mod.ts";
  */
 export async function readLine() {
   const tpr = new TextProtoReader(new BufReader(Deno.stdin));
-  /** @type {string | Deno.EOF} */
+  ///** @type {string | Deno.EOF} */
   const line = await tpr.readLine();
   if (typeof line === "string") return line;
   else return "";
