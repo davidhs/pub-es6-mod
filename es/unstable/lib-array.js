@@ -4,6 +4,7 @@
  * @type {<T>(arr: T[]) => T[]}
  */
 export function getShuffled(arr) {
+  // TODO: add ability to provide own uniform random number generator.
   const copy = [...arr]; // Copy array
   return shuffleInPlace(copy);
 }
@@ -14,6 +15,7 @@ export function getShuffled(arr) {
  * @type {<T>(arr: T[]) => T[]}
  */
 export function shuffleInPlace(arr) {
+  // TODO: add ability to provide own uniform random number generator.
   const n = arr.length;
   for (let i = 0; i < n; i += 1) {
     // Math.random() in [0, 1), hence k * Math.random() gives [0, k) and

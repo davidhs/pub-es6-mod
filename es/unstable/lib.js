@@ -1,33 +1,17 @@
-/// <reference path="./lib.types.d.ts" />
-
 // TODO: add the ability to check whether two items are equivalent and are identical.
 
 /**
- *
- * @param {unknown} condition
- * @param {string=} message
+ * 
+ * @type {(condition: any, message?: string) asserts condition}
+ * @param condition
+ * @param message
  */
-function assert_function(condition, message = "") {
+export function assert(condition, message = "") {
   if (!condition) {
     throw new Error(`Assertion failed: ${message}`);
   }
 }
 
-/**
- * Asserts the condition.  If the condition is falsy then the assertion fails
- * and an error is thrown with a given message.
- *
- * @param {any} condition If the condition is falsy then the assertion fails.
- * @param {string=} message The text to display if the assertion failed.
- * @returns {void}
- *
- * @type {declared_assert_function}
- */
-// HACK: this is a hack so I can get `assert` to behave like a TypeScript
-//       assertion function.  This is so I can use `assert(condition)` in my code and
-//       get the same type checking I get when I would use
-//       `if (!condition) throw new Error()`.
-export const assert = assert_function;
 
 /**
  * Returns `true` if the input has the value of undefined.
