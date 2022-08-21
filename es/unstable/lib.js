@@ -2,7 +2,7 @@
 
 /**
  * 
- * @type {(condition: any, message?: string) asserts condition}
+ * @type {(condition: any, message?: string) => asserts condition}
  * @param condition
  * @param message
  */

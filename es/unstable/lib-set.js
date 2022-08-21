@@ -3,8 +3,8 @@
  *
  * @type {<A, B>(a: Set<A>, b: Set<B>) => Set<A | B>}
  *
- * @param {Set<any>} a
- * @param {Set<any>} b
+ * @param {Set<A>} a
+ * @param {Set<B>} b
  */
 export function getSetUnion(a, b) {
   const union = new Set([...a, ...b]);
